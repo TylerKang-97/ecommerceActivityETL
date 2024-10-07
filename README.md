@@ -2,6 +2,13 @@
 - CSVProcessor: CSV 파일 처리 및 파티셔닝 작업 수행
 - ExternalTableCreator: External Table 생성 및 조회
 
+### 버전
+- Scala 2.13.12
+- Java 11
+- Apache Spark 3.5.3
+- Parquet 1.12.3
+- Hadoop 3.3.4
+
 ### 주요 기능
 - CSV 파일 처리
   - CSV 파일을 읽어 event_time 열의 UTC 시간을 KST로 변환하고, date 열을 추가해 일별로 데이터를 파티셔닝하였습니다.
@@ -17,8 +24,11 @@
 
 - 배치 장애 복구
   - 배치 작업 도중 장애가 발생할 경우, 해당 파일로부터 생성된 Parquet 파일 및 파티션을 삭제하고 작업을 복구합니다.
+ 
+### 결과
+> 데이터가 성공적으로 처리된 경우, Parquet 파일은 $PATH/output 디렉터리에 저장되고, 처리 완료된 파일은 $PATH/done 디렉터리로 이동됩니다.
 
-#### 프로젝트 구조
+### 프로젝트 구조
 ```
 .
 ├── src
@@ -40,10 +50,9 @@
 
 ```
 
-#### 버전
-- Scala 2.13.12
-- Java 11
-- Apache Spark 3.5.3
-- Parquet 1.12.3
-- Hadoop 3.3.4
+### 주의 사항
+- CSV 파일 경로($PATH), Parquet 저장 경로($PATH/output), 처리 완료 파일 경로($PATH/done) 등은 실제 환경에 맞게 변경해 주세요.
+- Hive 설정 및 경로는 적절하게 구성되어 있어야 합니다.
+- 애플리케이션은 정상적으로 작동하지만 sbt run 종료 시 아래와 같은 경고 메시지 또는 버전 이슈가 발생할 수 있습니다.
+  - Unable to load native-hadoop library
 
