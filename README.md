@@ -1,4 +1,4 @@
-#### Application
+### Application
 - CSVProcessor: CSV 파일 처리 및 파티셔닝 작업 수행
 - ExternalTableCreator: External Table 생성 및 조회
 
