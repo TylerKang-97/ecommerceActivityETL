@@ -6,7 +6,7 @@ import java.nio.file.{Files, Paths, StandardCopyOption}
 import scala.sys.ShutdownHookThread
 
 object CSVProcessor {
-  @volatile var isShuttingDown = false // 종료 시그널을 처리하기 위한 플래그
+  @volatile private var isShuttingDown = false // 종료 시그널을 처리하기 위한 플래그
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
@@ -33,15 +33,15 @@ object CSVProcessor {
 
     import spark.implicits._
 
-    val inputPath = "/Users/tyler/Documents/spark/data/job"
-    val outputPath = "/Users/tyler/Documents/spark/data/job/output"
-    val donePath = "/Users/tyler/Documents/spark/data/job/done"
-    val successListPath = "/Users/tyler/Documents/spark/data/job/success_list.txt"
+    val inputPath = "/PATH" // 루트 경로, CSV 파일 위치
+    val outputPath = "/PATH/output" // Parquet 경로
+    val donePath = "/PATH/done" // 처리 완료된 CSV 파일을 이동시킬 디렉터리
+    val successListPath = "/PATH/success_list.txt"
 
     // Graceful 종료를 위한 Shutdown hook 추가
     val shutdownHook: ShutdownHookThread = sys.addShutdownHook {
       isShuttingDown = true // 종료 플래그 활성화
-      println("Graceful shutdown init... Performing cleanup...")
+      println("Graceful shutdown init...")
     }
 
     // success_list.txt에서 이미 처리된 파일 목록 읽기
@@ -56,11 +56,11 @@ object CSVProcessor {
     val newFiles = inputFiles.filterNot(filePath => processedFiles.contains(filePath))
 
     if (newFiles.nonEmpty) {
-      println(s"Processing new files: ${newFiles.mkString(", ")}")
+      println(s"Processing new input files: ${newFiles.mkString(", ")}")
 
       newFiles.foreach { file =>
         if (isShuttingDown) {
-          println("Shutdown in progress. Stopping file processing.")
+          println("Shutdown in progress. Stopping processing files.")
           return // 종료 플래그가 활성화되면 파일 처리 중단
         }
 
@@ -74,7 +74,7 @@ object CSVProcessor {
           val dfWithCorrectedTime = df.withColumn("event_time_cleaned", regexp_replace($"event_time", " UTC", ""))
             .withColumn("event_time_kst", from_utc_timestamp($"event_time_cleaned", "Asia/Seoul").cast(StringType))
 
-          // KST 기준으로 'date' 컬럼 추가
+          // KST 기준으로 date 컬럼 추가
           val dfWithDate = dfWithCorrectedTime.withColumn("date", date_format($"event_time_kst", "yyyy-MM-dd"))
             .drop("event_time_cleaned") // 임시 컬럼 삭제
 
@@ -100,7 +100,6 @@ object CSVProcessor {
 
           // External Table에 새로운 파티션 추가
           spark.sql("MSCK REPAIR TABLE user_activity_logs")
-          println("New partitions have been added to the external table.")
 
         } catch {
           case e: Exception =>
@@ -119,7 +118,7 @@ object CSVProcessor {
   }
 
   // 실패한 파일의 Parquet 파일 및 파티션을 삭제하는 함수
-  def cleanUpFailedFile(file: String, outputPath: String, spark: SparkSession): Unit = {
+  private def cleanUpFailedFile(file: String, outputPath: String, spark: SparkSession): Unit = {
     import spark.implicits._
     try {
       // 실패한 파일에서 생성된 parquet 파일 및 파티션 삭제 로직
