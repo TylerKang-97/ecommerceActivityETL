@@ -4,6 +4,7 @@ import org.apache.spark.sql.types._
 import java.io.{File, FileWriter, BufferedWriter}
 import java.nio.file.{Files, Paths, StandardCopyOption}
 import scala.sys.ShutdownHookThread
+import scala.util.Using
 
 object CSVProcessor {
   @volatile private var isShuttingDown = false // 종료 시그널을 처리하기 위한 플래그
@@ -87,9 +88,9 @@ object CSVProcessor {
           println(s"Data has been saved to $outputPath with daily partitions.")
 
           // 성공적으로 처리된 파일명을 success_list.txt에 기록
-          val writer = new BufferedWriter(new FileWriter(successListPath, true)) // true는 append 모드
-          writer.write(s"${file}\n")
-          writer.close()
+          Using(new BufferedWriter(new FileWriter(successListPath, true))) { writer =>
+            writer.write(s"${file}\n")
+          }
 
           // 파일을 Done 디렉터리로 이동
           val source = Paths.get(file)
