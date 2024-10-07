@@ -1,3 +1,7 @@
+#### Application
+- CSVProcessor: CSV 파일 처리 및 파티셔닝 작업 수행
+- ExternalTableCreator: External Table 생성 및 조회
+
 ### 주요 기능
 - CSV 파일 처리
   - CSV 파일을 읽어 event_time 열의 UTC 시간을 KST로 변환하고, date 열을 추가해 일별로 데이터를 파티셔닝하였습니다.
