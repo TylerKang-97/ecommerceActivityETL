@@ -36,3 +36,10 @@
 
 ```
 
+#### 버전
+- Scala 2.13.12
+- Java 11
+- Apache Spark 3.5.3
+- Parquet 1.12.3
+- Hadoop 3.3.4
+
