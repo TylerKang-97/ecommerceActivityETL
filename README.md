@@ -51,8 +51,7 @@
 ```
 
 ### 주의 사항
-- CSV 파일 경로($PATH), Parquet 저장 경로($PATH/output), 처리 완료 파일 경로($PATH/done) 등은 실제 환경에 맞게 변경해 주세요.
-- Hive 설정 및 경로는 적절하게 구성되어 있어야 합니다.
+- CSV 파일 경로($PATH), Parquet 저장 경로($PATH/output), 처리 완료 파일 경로($PATH/done) 등은 프로젝트 구조를 참고 부탁드립니다.
 - 애플리케이션은 정상적으로 작동하지만 sbt run 종료 시 아래와 같은 경고 메시지 또는 버전 이슈가 발생할 수 있습니다.
   - Unable to load native-hadoop library
 
